@@ -37,14 +37,27 @@ jobs:
           printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/deploy_key"
           chmod 600 "$HOME/.ssh/deploy_key"
 
-          ssh-keyscan -p "$DEPLOY_PORT" "$DEPLOY_HOST" > "$HOME/.ssh/known_hosts"
+          echo "Testing connection to $DEPLOY_HOST:$DEPLOY_PORT"
+
+          ssh-keyscan -v -p "$DEPLOY_PORT" "$DEPLOY_HOST" > "$HOME/.ssh/known_hosts"
+
+          echo "ssh-keyscan exit code: $?"
+
+          echo "Known hosts:"
+          cat "$HOME/.ssh/known_hosts"
 
           EXPECTED="SHA256:9WuMbIQi1pZ7lhdzEztIHkxpxnvYX94M5dsCJBVzgQw"
+
+          echo "Checking host fingerprint..."
+
+          ssh-keygen -lf "$HOME/.ssh/known_hosts" -E sha256
 
           if ! ssh-keygen -lf "$HOME/.ssh/known_hosts" -E sha256 | grep -F "$EXPECTED" > /dev/null; then
             echo "ERROR: SSH host key fingerprint does not match!"
             exit 1
           fi
+
+          echo "SSH host fingerprint matches."
 
       - name: Deploy frontend
         env:

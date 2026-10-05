@@ -1,4 +1,4 @@
-name: Build frontend
+name: Build and deploy frontend
 
 on:
   push:
@@ -24,3 +24,41 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+      - name: Configure SSH
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          ssh-keyscan -p "$DEPLOY_PORT" "$DEPLOY_HOST" > ~/.ssh/known_hosts
+
+          EXPECTED="SHA256:9WuMbIQi1pZ7lhdzEztIHkxpxnvYX94M5dsCJBVzgQw"
+
+          if ! ssh-keygen -lf ~/.ssh/known_hosts -E sha256 | grep -F "$EXPECTED" > /dev/null; then
+            echo "ERROR: SSH host key fingerprint does not match!"
+            exit 1
+          fi
+
+      - name: Deploy frontend
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+        run: |
+          ssh \
+            -i ~/.ssh/deploy_key \
+            -p "$DEPLOY_PORT" \
+            deploy@"$DEPLOY_HOST" \
+            'rm -rf /var/www/laravel-library/public/build/*'
+
+          scp \
+            -i ~/.ssh/deploy_key \
+            -P "$DEPLOY_PORT" \
+            -r public/build/* \
+            deploy@"$DEPLOY_HOST":/var/www/laravel-library/public/build/

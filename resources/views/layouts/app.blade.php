@@ -20,7 +20,7 @@
     <header class="border-b border-gray-200 bg-white">
         <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <a href="{{ route('authors.index') }}" class="text-xl font-bold text-gray-900">
-                📚 Library
+                📚 Library -
             </a>
 
             <nav class="flex items-center gap-6 text-sm font-medium">

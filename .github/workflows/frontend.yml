@@ -31,17 +31,17 @@ jobs:
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
 
-          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/deploy_key"
+          chmod 600 "$HOME/.ssh/deploy_key"
 
-          ssh-keyscan -p "$DEPLOY_PORT" "$DEPLOY_HOST" > ~/.ssh/known_hosts
+          ssh-keyscan -p "$DEPLOY_PORT" "$DEPLOY_HOST" > "$HOME/.ssh/known_hosts"
 
           EXPECTED="SHA256:9WuMbIQi1pZ7lhdzEztIHkxpxnvYX94M5dsCJBVzgQw"
 
-          if ! ssh-keygen -lf ~/.ssh/known_hosts -E sha256 | grep -F "$EXPECTED" > /dev/null; then
+          if ! ssh-keygen -lf "$HOME/.ssh/known_hosts" -E sha256 | grep -F "$EXPECTED" > /dev/null; then
             echo "ERROR: SSH host key fingerprint does not match!"
             exit 1
           fi

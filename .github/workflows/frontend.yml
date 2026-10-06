@@ -68,22 +68,23 @@ jobs:
             -i "$HOME/.ssh/deploy_key" \
             -p "$DEPLOY_PORT" \
             deploy@"$DEPLOY_HOST" \
-            'rm -rf /var/www/laravel-library/public/build-new && mkdir /var/www/laravel-library/public/build-new'
+            'rm -rf /var/www/laravel-library/deploy/build-new && mkdir /var/www/laravel-library/deploy/build-new'
 
           scp \
             -i "$HOME/.ssh/deploy_key" \
             -P "$DEPLOY_PORT" \
             -r public/build/* \
-            deploy@"$DEPLOY_HOST":/var/www/laravel-library/public/build-new/
+            deploy@"$DEPLOY_HOST":/var/www/laravel-library/deploy/build-new/
 
           ssh \
             -i "$HOME/.ssh/deploy_key" \
             -p "$DEPLOY_PORT" \
             deploy@"$DEPLOY_HOST" \
             '
-              test -f /var/www/laravel-library/public/build-new/manifest.json &&
+              test -f /var/www/laravel-library/deploy/build-new/manifest.json &&
               rm -rf /var/www/laravel-library/public/build-old &&
+              rm -rf /var/www/laravel-library/public/build-new &&
               mv /var/www/laravel-library/public/build /var/www/laravel-library/public/build-old &&
-              mv /var/www/laravel-library/public/build-new /var/www/laravel-library/public/build &&
+              mv /var/www/laravel-library/deploy/build-new /var/www/laravel-library/public/build &&
               rm -rf /var/www/laravel-library/public/build-old
             '

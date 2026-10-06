@@ -81,8 +81,4 @@ jobs:
             -i "$HOME/.ssh/deploy_key" \
             -p "$DEPLOY_PORT" \
             deploy@"$DEPLOY_HOST" \
-            "
-              test -f /var/www/laravel-library/deploy/releases/$GITHUB_SHA/manifest.json &&
-              ln -sfn /var/www/laravel-library/deploy/releases/$GITHUB_SHA /var/www/laravel-library/public/build.new &&
-              mv -Tf /var/www/laravel-library/public/build.new /var/www/laravel-library/public/build
-            "
+            "sudo /usr/local/bin/deploy-laravel-frontend /var/www/laravel-library/deploy/releases/$GITHUB_SHA"
